@@ -18,6 +18,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using System.Windows.Forms;
+using System.IO;
+using System.Linq.Expressions;
 
 namespace Export
 {
@@ -199,7 +201,7 @@ namespace Export
                             // get sustav
                             toplinski_sustav = podst.getField("po_sustav").getString();
                             char firstChar = toplinski_sustav.Substring(0, 1)[0];
-                            Debug.WriteLine(toplinski_sustav);
+                            // Debug.WriteLine(toplinski_sustav);
 
                             obracunsko_mjerno_mjesto_grijanje = racun.getField("rr_mjestog").getString();
                             obracunsko_mjerno_mjesto_voda = racun.getField("rr_mjestov").getString();
@@ -216,10 +218,10 @@ namespace Export
                             OIB = mat.getField("m_oib").getString();
                             Console.WriteLine(OIB);
                             namjena = obracunsko_mjerno_mjesto_voda != "0" ? "GRIJANJE - PTV" : "GRIJANJE";
-                            adresa_obracunskog_mjernog_mjesta = $"{mjul.getField("mu_uln").getString()} {mat.getField("m_kbr").getString()}";
+                            adresa_obracunskog_mjernog_mjesta = $"{mjul.getField("mu_uln").getString()} {mat.getField("m_sub").getString()}";
                             grad_omm = "VUKOVAR";
 
-                            naziv_toplinskog_sustava = toplinski_sustav.Substring(0, 1)[0] == 'C' ? "Centralni" : "Zatvoreni";
+                            naziv_toplinskog_sustava = toplinski_sustav.Substring(0, 1)[0] == 'C' ? "C" : "Z";
                             try
                             {
                                 refundacija_od = racun.getField("rr_dp").getString();
@@ -244,6 +246,13 @@ namespace Export
                             }
 
                             tarifni_model = mat.getField("m_tm").getString();
+                            if(tarifni_model == "TM9" || tarifni_model == "TM10")
+                            {
+                                tarifni_model = "TM1";
+                            }else if(tarifni_model == "TM5" || tarifni_model == "TM6")
+                            {
+                                tarifni_model = "TM2";
+                            }
 
                             isporucena_toplinska_energija = (racun.getField("rr_energ").getDouble() + racun.getField("rr_ptv").getDouble() + racun.getField("rr_ener").getDouble()).ToString("F3");
 
@@ -283,7 +292,7 @@ namespace Export
                             line.Add(refundacija_do);
                             line.Add(tarifni_model);
                             line.Add(isporucena_toplinska_energija);
-                            line.Add($"{iznos_razlike_jed} {valuta}/kWh");
+                            line.Add($"{iznos_razlike_jed}");
                             line.Add(ukupanIznosRacuna);
                             line.Add(ukupanIznosRacunaNakonUmanjenja);
                             line.Add(iznos_razlike);
@@ -351,7 +360,17 @@ namespace Export
                         // make a new cell
                         Cell cell = new Cell();
                         cell.CellReference = "S" + i.ToString();
-                        cell.CellFormula = new CellFormula($"HYPERLINK(\"../pregled/racun{rowData[1]}_{year}.pdf\",\"racun{rowData[1]}_{year}.pdf\")");
+                        string path = $"D:/Tehnon2023/pregled/racun{rowData[1]}_{year}.pdf";
+
+                        if (File.Exists(path))
+                        {
+                            cell.CellFormula = new CellFormula($"HYPERLINK(\"{path}\",\"racun{rowData[1]}_{year}.pdf\")");
+                        }
+                        else
+                        {
+                            cell.CellValue = new CellValue("NE POSTOJI GENERIRANI RAČUN");
+                            cell.DataType = new EnumValue<CellValues>(CellValues.String);
+                        }
                         row.Append(cell);
                         sheetData.Append(row);
                         i++;
@@ -368,11 +387,17 @@ namespace Export
                 // Save the changes to the spreadsheet document
                 worksheetPart.Worksheet.Save();
                 spreadsheetDocument.WorkbookPart.Workbook.Save();
+                racun.rewind();
             }
         }
 
 
         public static void CreateExcelFile(string filePath)
+{
+    bool success = false;
+    while (!success)
+    {
+        try
         {
             // Create a new spreadsheet document
             using (SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Create(filePath, SpreadsheetDocumentType.Workbook))
@@ -401,10 +426,21 @@ namespace Export
 
                 // Save the changes to the spreadsheet document
                 workbookPart.Workbook.Save();
+
+                // Set success to true to break out of the while loop
+                success = true;
             }
-
-
         }
+        catch (System.IO.IOException ex)
+        {
+            // Show an error message
+            MessageBox.Show("Ne mogu pristupiti datoteci. Ako se već koristi u nekom programu zatvorite ju");
+
+            // Wait for a short period before trying again
+            System.Threading.Thread.Sleep(1000);
+        }
+    }
+}
 
         private static Cell CreateCell(object value)
         {

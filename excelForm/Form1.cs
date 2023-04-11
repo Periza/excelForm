@@ -27,22 +27,24 @@ namespace ExcelForm
             string[] arguments = { "C:\\Sculptor\\bin\\kfserver.exe" };
 
             // set dates in the export class
+            RacunRepository racunRepository = new RacunRepository();
 
+            
+            Racun r1 = (Racun)racunRepository.NextRecord();
+            Racun r2 = (Racun)racunRepository.NextRecord();
+            Racun r3 = (Racun)racunRepository.PreviousRecord();
+
+            Debug.WriteLine(r1.krajnji_kupac);
+            Debug.WriteLine(r2.krajnji_kupac);
+            Debug.WriteLine(r3.krajnji_kupac);
+
+            return;
 
 
             Export.Export.start(arguments);
-            List<string> dates = Export.Export.getByDate("25.02.2023");
-            foreach (string date in dates)
-            {
-                Debug.WriteLine(date);
-            }
 
             Debug.WriteLine("Gotov");
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
     }
 }
