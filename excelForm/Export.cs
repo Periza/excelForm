@@ -20,6 +20,8 @@ using System;
 using System.Windows.Forms;
 using System.IO;
 using System.Linq.Expressions;
+using System.Reflection;
+using System.Threading;
 
 namespace Export
 {
@@ -34,11 +36,10 @@ namespace Export
         public static KeyedFile mjul;
         public static KeyedFile podst;
 
-        public static DateTime DatumRacuna { set; get; }
-
-
-        public static string DatumOd { set; get; }
-        public static string DatumDo { set; get; }
+        private static double sumIsporucenaToplinskaEnergija;
+        private static double sumUkupanIznosRacuna;
+        private static double sumUkupanIznosRacunaNakonUmanjenja;
+        private static double sumIznosRazlike;
 
         private static readonly string[] HEADERS = {
                 "OBRAČUNSKO MJERNO MJESTO",
@@ -56,12 +57,12 @@ namespace Export
                 "ISPORUČENA TOPLINSKA ENERGIJA",
                 "IZNOS RAZLIKE SUKLADNO ODLUCI VLADE RH(EUR(KN/KWH))",
                 "UKUPAN IZNOS RAČUNA KRAJNJEG KUPCA PRIJE UMANJENJA",
-                "UKUPAN IZNOST RAČUNA KRAJNJEG KUPCA NAKON UMANJENJA",
+                "UKUPAN IZNOS RAČUNA KRAJNJEG KUPCA NAKON UMANJENJA",
                 "IZNOS RAZLIKE SUKLADNO ODLUCI VLADE RH",
                 "NAPOMENA",
                 "LINK NA VEZANI DOKUMENT(RAČUN KRAJ.KUPCA U PRILOGU)"
         };
-        public static void start(string[] args)
+        public static void start(string[] args, Label progressLabel)
         {
             Process[] pname = Process.GetProcessesByName("kfserver");
 
@@ -109,7 +110,6 @@ namespace Export
                 projectPath = "D:\\Tehnon2023\\tehnon23";
             }
 
-
             database = new Database(server,
                                     "baza",
                                     Database.Type.SCULPTOR,
@@ -118,7 +118,7 @@ namespace Export
                                     5,
                                     "log.txt");
 
-            // Open all needed tables in read mode
+            /*
             racun = database.openTable("racun14", KeyedFile.Mode.READ);
             mat = database.openTable("mat", KeyedFile.Mode.READ);
             mjul = database.openTable("mjul", KeyedFile.Mode.READ);
@@ -128,207 +128,79 @@ namespace Export
             racun.rewind();
             mat.rewind();
             mjul.rewind();
+            */
 
 
 
             // Get all data in List<List<string>>
             List<List<object>> data = new List<List<object>>();
 
+            RacunRepository repo = new RacunRepository(server, database);
+
+            // Using reflection, get all fields of the class
+
+            PropertyInfo[] properties = typeof(Racun).GetProperties();
+
+            progressLabel.Text = "Prikupljanje podataka iz baze...";
+            progressLabel.Refresh();
+
+            int counter = 0;
             while (true)
             {
-                List<object> line = new List<object>(); // one line in the excel file
-                string obracunsko_mjerno_mjesto_grijanje;
-                string obracunsko_mjerno_mjesto_voda;
-                string obracunska_mjerna_mjesta;
-                string rr_rn;
-                string interni_broj_racuna;
-                string krajnji_kupac;
-                string OIB;
-                string namjena;
-                string adresa_obracunskog_mjernog_mjesta;
-                string grad_omm;
-                string naziv_toplinskog_sustava;
-                string refundacija_od;
-                string refundacija_do;
-                string isporucena_toplinska_energija;
-                string tarifni_model;
-                string iznos_razlike_jed;
-                double iznos_razlike;
-                double ukupanIznosRacuna;
-                double ukupanIznosRacunaNakonUmanjenja;
-                string napomena;
-                string valuta;
-
-                string toplinski_sustav;
-
-                // test
-                string date_format = "dd.MM.yyyy";
+                
+                List<object> line = new List<object>();
                 try
                 {
-                    racun.nextu();
-                    List<object> row = new List<object>();
+                    Racun rac = (Racun)repo.NextRecord();
 
-                    string rr_siz = racun.getField("rr_siz").getString();
-                    string rr_sif = racun.getField("rr_sif").getString();
-                    string rr_sst = racun.getField("rr_sst").getString();
+                    
 
-                    string rr_pod = racun.getField("rr_pod").getString();
+                    if (rac.iznos_razlike == 0) continue;
+                    sumIsporucenaToplinskaEnergija += rac.isporucena_toplinska_energija;
+                    sumUkupanIznosRacuna += rac.ukupanIznosRacuna;
+                    sumUkupanIznosRacunaNakonUmanjenja += rac.ukupanIznosRacunaNakonUmanjenja;
+                    sumIznosRazlike += rac.iznos_razlike;
+                    line.Add(rac.obracunska_mjerna_mjesta);
+                    line.Add(rac.interni_broj_racuna);
+                    line.Add(rac.interni_broj_racuna);
+                    line.Add(rac.krajnji_kupac);
+                    line.Add(rac.OIB);
+                    line.Add(rac.namjena);
+                    line.Add(rac.adresa_obracunskog_mjernog_mjesta);
+                    line.Add(rac.grad_omm);
+                    line.Add(rac.naziv_toplinskog_sustava);
+                    line.Add(rac.refundacija_od);
+                    line.Add(rac.refundacija_do);
+                    line.Add(rac.tarifni_model);
+                    line.Add(Math.Round(rac.isporucena_toplinska_energija, 3));
+                    line.Add(rac.iznos_razlike_jed);
+                    line.Add(rac.ukupanIznosRacuna);
+                    line.Add(rac.ukupanIznosRacunaNakonUmanjenja);
+                    line.Add(rac.iznos_razlike);
+                    line.Add(rac.napomena);
 
-                    mat.getField("m_siz").setString(rr_siz);
-                    mat.getField("m_sif").setString(rr_sif);
-                    mat.getField("m_sst").setString(rr_sst);
-                    try
-                    {
-                        mat.findu();
-
-                        string m_mj = mat.getField("m_mj").getString();
-                        string m_ul = mat.getField("m_ul").getString();
-
-                        mjul.getField("mu_mj").setString(m_mj);
-                        mjul.getField("mu_ul").setString(m_ul);
-
-                        try
-                        {
-                            mjul.findu();
-                            /*
-                            MJUL.mu_mjn/ + "", FILE_RACUN14.rr_rn, FILE_RACUN14.rr_rn, MAT.m_ime/ + "","GRIJANJE"/ + "",MJUL.mu_uln/ + " " + MAT.m_kbr/ + ",
-                             " + MJUL.mu_mjn/ + "",MAT.m_ommg/ + "", "NAZIV TOPLINSKOG SUSTAVA",FILE_RACUN14.rr_datp, FILE_RACUN14.rr_datn, MAT.m_tm/ + "", 
-                             "ISPORUCENA_TOPLINSKA_ENERGIJA", convertCommasToDots(tmp.razlika)/ + " " + tostr(tmp.valuta)/ + "", convertCommasToDots(FILE_RACUN14.rr_sveukk)/ + "", 
-                             convertCommasToDots(FILE_RACUN14.rr_sveukkk)/ + "", convertCommasToDots(tmp.razlika)/ + "", "NAPOMENA"
-                             */
-                            podst.getField("po_br").setString(rr_pod);
-                            podst.findu();
-                            // get sustav
-                            toplinski_sustav = podst.getField("po_sustav").getString();
-                            char firstChar = toplinski_sustav.Substring(0, 1)[0];
-                            // Debug.WriteLine(toplinski_sustav);
-
-                            obracunsko_mjerno_mjesto_grijanje = racun.getField("rr_mjestog").getString();
-                            obracunsko_mjerno_mjesto_voda = racun.getField("rr_mjestov").getString();
-                            obracunska_mjerna_mjesta = obracunsko_mjerno_mjesto_grijanje;
-                            if (obracunsko_mjerno_mjesto_voda != "0")
-                            {
-                                obracunska_mjerna_mjesta += $" - {obracunsko_mjerno_mjesto_voda}";
-                            }
-                            Debug.WriteLine(obracunsko_mjerno_mjesto_grijanje);
-                            Debug.WriteLine(obracunsko_mjerno_mjesto_voda);
-                            rr_rn = racun.getField("rr_rn").getString();
-                            interni_broj_racuna = racun.getField("rr_rn").getString();
-                            krajnji_kupac = mat.getField("m_ime").getString();
-                            OIB = mat.getField("m_oib").getString();
-                            Console.WriteLine(OIB);
-                            namjena = obracunsko_mjerno_mjesto_voda != "0" ? "GRIJANJE - PTV" : "GRIJANJE";
-                            adresa_obracunskog_mjernog_mjesta = $"{mjul.getField("mu_uln").getString()} {mat.getField("m_sub").getString()}";
-                            grad_omm = "VUKOVAR";
-
-                            naziv_toplinskog_sustava = toplinski_sustav.Substring(0, 1)[0] == 'C' ? "C" : "Z";
-                            try
-                            {
-                                refundacija_od = racun.getField("rr_dp").getString();
-                                DateTime datum = Helpers.convertToDateTime(refundacija_od);
-                                datum = datum.AddDays(datum.Day * (-1) + 1);
-                                refundacija_od = (datum).ToString("dd.MM.yyyy");
-                            }
-                            catch (System.ArgumentOutOfRangeException ex)
-                            {
-                                refundacija_od = String.Empty;
-                            }
-
-                            try
-                            {
-                                refundacija_do = racun.getField("rr_dp").getString();
-
-                            }
-                            catch (System.ArgumentOutOfRangeException ex)
-                            {
-                                Debug.WriteLine(ex.Message);
-                                refundacija_do = String.Empty;
-                            }
-
-                            tarifni_model = mat.getField("m_tm").getString();
-                            if(tarifni_model == "TM9" || tarifni_model == "TM10")
-                            {
-                                tarifni_model = "TM1";
-                            }else if(tarifni_model == "TM5" || tarifni_model == "TM6")
-                            {
-                                tarifni_model = "TM2";
-                            }
-
-                            isporucena_toplinska_energija = (racun.getField("rr_energ").getDouble() + racun.getField("rr_ptv").getDouble() + racun.getField("rr_ener").getDouble()).ToString("F3");
-
-
-                            // isporucena_toplinska_energija = "ISPORUCENA TOPLINSKA ENERGIJA";
-
-                            /* Set currency depending on the year of issue of the bill*/
-                            valuta = "EUR";
-                            // Get date of the bill
-                            string[] date = racun.getField("rr_dp").getString().Split('.');
-                            int year = int.Parse(date[date.Length - 1]);
-
-                            if (year < 2023)
-                            {
-                                valuta = "HRK";
-                            }
-                            iznos_razlike_jed = Math.Abs(racun.getField("rr_cij_subv").getDouble()).ToString();
-
-                            ukupanIznosRacuna = racun.getField("rr_sveukk").getDouble();
-                            ukupanIznosRacunaNakonUmanjenja = racun.getField("rr_sveukkk").getDouble();
-                            iznos_razlike = Math.Abs(racun.getField("rr_subv").getDouble());
-                            if (iznos_razlike == 0) continue;
-                            napomena = "";
-
-                            // Console.WriteLine($"{obracunsko_mjerno_mjesto}, {rr_rn}, {interni_broj_racuna}, {krajnji_kupac}, {namjena}, {adresa_obracunskog_mjernog_mjesta}, {grad_omm}");
-                            line.Add(obracunska_mjerna_mjesta);
-                            line.Add(rr_rn);
-                            line.Add(interni_broj_racuna);
-                            line.Add(krajnji_kupac);
-                            line.Add(OIB);
-                            Console.WriteLine(krajnji_kupac);
-                            line.Add(namjena);
-                            line.Add(adresa_obracunskog_mjernog_mjesta);
-                            line.Add(grad_omm);
-                            line.Add(naziv_toplinskog_sustava);
-                            line.Add(refundacija_od);
-                            line.Add(refundacija_do);
-                            line.Add(tarifni_model);
-                            line.Add(isporucena_toplinska_energija);
-                            line.Add($"{iznos_razlike_jed}");
-                            line.Add(ukupanIznosRacuna);
-                            line.Add(ukupanIznosRacunaNakonUmanjenja);
-                            line.Add(iznos_razlike);
-                            line.Add(napomena);
-                        }
-                        catch (KfException ex)
-                        {
-                            // Console.WriteLine("mjul exception: " + ex.Message);
-                        }
-                    }
-                    catch (KfException ex)
-                    {
-                        // Console.WriteLine("mat exception: " + ex.Message);
-                        // Console.WriteLine($"{rr_siz}, {rr_sst}, {rr_sif}");
-                    }
-
+                    data.Add(line);
+                        
                 }
-
                 catch (KfException ex)
                 {
-                    // Console.WriteLine("racun exception: " + ex.Message);
+                    Debug.WriteLine(ex.Message);
                     break;
                 }
-                catch(System.Net.Sockets.SocketException ex)
-                {
-                    MessageBox.Show("Greška kod spajanja na bazu.\n Molimo nemojte zatvarati proces.");
-                    return;
-                }
-                // append line to the data
-                data.Add(line);
+
+           
             }
 
             string fileName = "izvjestaj.xlsx";
+
+            progressLabel.Text = "Zapisivanje podataka u excel datoteku...";
+            progressLabel.Refresh();
+
             CreateExcelFile(fileName);
             FillDatabase(fileName, data);
 
+            progressLabel.Text = "Gotovo";
+            progressLabel.Refresh();
         }
 
         public static void FillDatabase(string filePath, List<List<object>> data)
@@ -340,6 +212,8 @@ namespace Export
 
                 // Get the sheet data
                 SheetData sheetData = worksheetPart.Worksheet.GetFirstChild<SheetData>();
+
+                EnumValue<CellValues> cellType = new EnumValue<CellValues>(CellValues.String);
 
                 // Add the data rows
                 int i = 2;
@@ -369,11 +243,12 @@ namespace Export
                         else
                         {
                             cell.CellValue = new CellValue("NE POSTOJI GENERIRANI RAČUN");
-                            cell.DataType = new EnumValue<CellValues>(CellValues.String);
+                            cell.DataType = cellType;
                         }
                         row.Append(cell);
                         sheetData.Append(row);
                         i++;
+
                     }
                     catch (System.Net.Sockets.SocketException ex)
                     {
@@ -382,13 +257,50 @@ namespace Export
                     }
                 }
 
-
-
+                addSums(sheetData, i);
                 // Save the changes to the spreadsheet document
                 worksheetPart.Worksheet.Save();
                 spreadsheetDocument.WorkbookPart.Workbook.Save();
-                racun.rewind();
+                // racun.rewind();
             }
+        }
+
+        private static void addSums(SheetData sheetData, int i)
+        {
+            Row row = new Row();
+            EnumValue<CellValues> numberType = new EnumValue<CellValues>(CellValues.Number);
+
+            // isporučena energija
+            Cell sumEnergyCell = new Cell();
+            sumEnergyCell.CellReference = $"M{i}";
+            sumEnergyCell.CellValue = new CellValue(sumIsporucenaToplinskaEnergija);
+            sumEnergyCell.DataType = numberType;
+
+            // ukupan iznos računa
+            Cell sumUkupanIznosRacunaCell = new Cell();
+            sumUkupanIznosRacunaCell.CellReference = $"O{i}";
+            sumUkupanIznosRacunaCell.CellValue = new CellValue(sumUkupanIznosRacuna);
+            sumUkupanIznosRacunaCell.DataType = numberType;
+
+            // ukupan iznos računa nakon umanjena
+            Cell sumUkupanIznosRacunaNakonUmanjenjaCell = new Cell();
+            sumUkupanIznosRacunaNakonUmanjenjaCell.CellReference = $"P{i}";
+            sumUkupanIznosRacunaNakonUmanjenjaCell.CellValue = new CellValue(sumUkupanIznosRacunaNakonUmanjenja);
+            sumUkupanIznosRacunaNakonUmanjenjaCell.DataType = numberType;
+
+            // Iznos razlike
+            Cell sumIznosRazlikeCell = new Cell();
+            sumIznosRazlikeCell.CellReference = $"Q{i}";
+            sumIznosRazlikeCell.CellValue = new CellValue(sumIznosRazlike);
+            sumIznosRazlikeCell.DataType = numberType;
+
+
+            row.Append(sumEnergyCell);
+            row.Append(sumUkupanIznosRacunaCell);
+            row.Append(sumUkupanIznosRacunaNakonUmanjenjaCell);
+            row.Append(sumIznosRazlikeCell);
+            sheetData.Append(row);
+            
         }
 
 
@@ -471,6 +383,8 @@ namespace Export
             return cell;
         }
 
+
+
         public static string getFirst()
         {
             KeyedFile racun = database.openTable("racun14", KeyedFile.Mode.READ);
@@ -479,6 +393,7 @@ namespace Export
 
             return racun.getField("rr_dp").getString();
         }
+
 
         // filtriraj po datumu racuna
         public static List<string> getByDate(string date)

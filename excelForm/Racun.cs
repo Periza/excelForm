@@ -26,7 +26,7 @@ namespace ExcelForm
         public string naziv_toplinskog_sustava { get;  set; }
         public string refundacija_od{ get;  set; }
         public string refundacija_do{ get;  set; }
-        public string isporucena_toplinska_energija { get; set; }
+        public double isporucena_toplinska_energija { get; set; }
         public string tarifni_model{get; set;}
         public string iznos_razlike_jed{get; set;}
         public double iznos_razlike{get; set;}

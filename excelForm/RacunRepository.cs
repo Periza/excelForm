@@ -24,27 +24,18 @@ namespace ExcelForm
         public KeyedFile mjul;
         public KeyedFile podst;
 
-        public RacunRepository(Server server = null, string projectPath = null, KeyedFile.Mode mode = KeyedFile.Mode.READ) 
+        
+
+        public RacunRepository(Server server, Database database, KeyedFile.Mode mode = KeyedFile.Mode.READ) 
         {
-            Process kfserverProcess = Process.Start("C:\\Sculptor\\bin\\kfserver.exe");
+            // Process kfserverProcess = Process.Start("C:\\Sculptor\\bin\\kfserver.exe");
             // If the server is not provided, set it to default value
             if (server == null)
             {
                 server = new Server(Dns.GetHostEntry(IPAddress.Loopback).HostName, 10);
             }
 
-            if(projectPath == null)
-            {
-                projectPath = "D:\\Tehnon2023\\tehnon23";
-            }
-
-            database = new Database(server,
-                                    "baza",
-                                    Database.Type.SCULPTOR,
-                                    Database.Flag.IGNORE_CATALOG,
-                                    projectPath,
-                                    5,
-                                    "log.txt");
+            
 
             racun = database.openTable("racun14", mode);
             mat = database.openTable("mat", mode);
@@ -89,15 +80,17 @@ namespace ExcelForm
 
         private void setFields(Racun rac)
         {
-            string rr_siz = racun.getField("rr_siz").getString();
-            string rr_sif = racun.getField("rr_sif").getString();
-            string rr_sst = racun.getField("rr_sst").getString();
+            rac.rr_siz = racun.getField("rr_siz").getString();
+            rac.rr_sif = racun.getField("rr_sif").getString();
+            rac.rr_sst = racun.getField("rr_sst").getString();
+
+            
 
             string rr_pod = racun.getField("rr_pod").getString();
 
-            mat.getField("m_siz").setString(rr_siz);
-            mat.getField("m_sif").setString(rr_sif);
-            mat.getField("m_sst").setString(rr_sst);
+            mat.getField("m_siz").setString(rac.rr_siz);
+            mat.getField("m_sif").setString(rac.rr_sif);
+            mat.getField("m_sst").setString(rac.rr_sst);
 
             try
             {
@@ -120,7 +113,7 @@ namespace ExcelForm
 
                     rac.toplinski_sustav = racun.getField("rr_mjestog").getString();
                     rac.obracunsko_mjerno_mjesto_voda = racun.getField("rr_mjestov").getString();
-                    rac.obracunska_mjerna_mjesta = rac.obracunsko_mjerno_mjesto_grijanje;
+                    rac.obracunska_mjerna_mjesta = racun.getField("rr_mjestog").getString();
                     if (rac.obracunsko_mjerno_mjesto_voda != "0")
                     {
                         rac.obracunska_mjerna_mjesta += $" - {rac.obracunsko_mjerno_mjesto_voda}";
@@ -169,7 +162,7 @@ namespace ExcelForm
                         rac.tarifni_model = "TM2";
                     }
 
-                    rac.isporucena_toplinska_energija = (racun.getField("rr_energ").getDouble() + racun.getField("rr_ptv").getDouble() + racun.getField("rr_ener").getDouble()).ToString("F3");
+                    rac.isporucena_toplinska_energija = racun.getField("rr_energ").getDouble() + racun.getField("rr_ptv").getDouble() + racun.getField("rr_ener").getDouble();
 
 
                     // isporucena_toplinska_energija = "ISPORUCENA TOPLINSKA ENERGIJA";
