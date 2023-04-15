@@ -8,7 +8,9 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ExcelForm
 {
@@ -26,7 +28,7 @@ namespace ExcelForm
 
         
 
-        public RacunRepository(Server server, Database database, KeyedFile.Mode mode = KeyedFile.Mode.READ) 
+        public RacunRepository(Server server, Database database, string table, KeyedFile.Mode mode = KeyedFile.Mode.READ) 
         {
             // Process kfserverProcess = Process.Start("C:\\Sculptor\\bin\\kfserver.exe");
             // If the server is not provided, set it to default value
@@ -37,7 +39,7 @@ namespace ExcelForm
 
             
 
-            racun = database.openTable("racun14", mode);
+            racun = database.openTable(table, mode);
             mat = database.openTable("mat", mode);
             mjul = database.openTable("mjul", mode);
             podst = database.openTable("podst", mode);
@@ -49,13 +51,25 @@ namespace ExcelForm
         public Record NextRecord()
         {
             Racun rac = new Racun();
-            try {
-                racun.next();
-
-                setFields(rac);
-            } catch(KfException ex) 
+            bool success = false;
+            while (!success)
             {
-                throw ex;
+                try
+                {
+                    racun.next();
+
+                    setFields(rac);
+
+                    success = true;
+                }
+                catch (KfException ex)
+                {
+                    throw ex;
+                }
+                catch(System.Net.Sockets.SocketException ex)
+                {
+                    throw ex;
+                }
             }
             return rac;
         }
@@ -177,7 +191,8 @@ namespace ExcelForm
                     {
                         rac.valuta = "HRK";
                     }
-                    rac.iznos_razlike_jed = Math.Abs(racun.getField("rr_cij_subv").getDouble()).ToString();
+
+                    rac.iznos_razlike_jed = racun.getField("rr_cij_subv") != null ? Math.Abs(racun.getField("rr_cij_subv").getDouble()).ToString() : "";
 
                     rac.ukupanIznosRacuna = racun.getField("rr_sveukk").getDouble();
                     rac.ukupanIznosRacunaNakonUmanjenja = racun.getField("rr_sveukkk").getDouble();
@@ -193,6 +208,10 @@ namespace ExcelForm
             {
                 // Console.WriteLine("mat exception: " + ex.Message);
                 // Console.WriteLine($"{rr_siz}, {rr_sst}, {rr_sif}");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
 

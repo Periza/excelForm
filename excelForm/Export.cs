@@ -41,6 +41,11 @@ namespace Export
         private static double sumUkupanIznosRacunaNakonUmanjenja;
         private static double sumIznosRazlike;
 
+        private static MemoryStream memoryStream;
+
+        private static Process kfserverProcess;
+
+
         private static readonly string[] HEADERS = {
                 "OBRAČUNSKO MJERNO MJESTO",
                 "RAČUN BROJ",
@@ -62,15 +67,13 @@ namespace Export
                 "NAPOMENA",
                 "LINK NA VEZANI DOKUMENT(RAČUN KRAJ.KUPCA U PRILOGU)"
         };
-        public static void start(string[] args, Label progressLabel)
+        public static void start(string[] args, Label progressLabel, string databaseName)
         {
             Process[] pname = Process.GetProcessesByName("kfserver");
 
             if (pname.Length == 0)
             {
                 // Console.WriteLine("starting kfserver...");
-
-                Process kfserverProcess;
 
                 if (args.Length == 1)
                 {
@@ -80,6 +83,7 @@ namespace Export
                 {
                     kfserverProcess = Process.Start("C:\\Sculptor\\bin\\kfserver.exe");
                 }
+
 
                 if (kfserverProcess.HasExited)
                 {
@@ -135,7 +139,7 @@ namespace Export
             // Get all data in List<List<string>>
             List<List<object>> data = new List<List<object>>();
 
-            RacunRepository repo = new RacunRepository(server, database);
+            RacunRepository repo = new RacunRepository(server, database, databaseName);
 
             // Using reflection, get all fields of the class
 
@@ -144,7 +148,6 @@ namespace Export
             progressLabel.Text = "Prikupljanje podataka iz baze...";
             progressLabel.Refresh();
 
-            int counter = 0;
             while (true)
             {
                 
@@ -187,6 +190,11 @@ namespace Export
                     Debug.WriteLine(ex.Message);
                     break;
                 }
+                catch(System.Net.Sockets.SocketException ex)
+                {
+                    Debug.WriteLine("Export exception");
+                    continue;
+                }
 
            
             }
@@ -201,11 +209,31 @@ namespace Export
 
             progressLabel.Text = "Gotovo";
             progressLabel.Refresh();
+
+            saveFile();
+
+            
+        }
+
+        private static void saveFile()
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+
+            saveFileDialog.Filter = "Excel Files (*.xlsx)|*.xlsx|All files (*.*)|*.*";
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+
+                using (FileStream fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create, FileAccess.Write))
+                {
+                    memoryStream.WriteTo(fileStream);
+                }
+            }
         }
 
         public static void FillDatabase(string filePath, List<List<object>> data)
         {
-            using (SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Open(filePath, true))
+            using (SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Open(memoryStream, true))
             {
                 // Get the worksheet part
                 WorksheetPart worksheetPart = spreadsheetDocument.WorkbookPart.WorksheetParts.First();
@@ -305,52 +333,55 @@ namespace Export
 
 
         public static void CreateExcelFile(string filePath)
-{
-    bool success = false;
-    while (!success)
-    {
-        try
         {
-            // Create a new spreadsheet document
-            using (SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Create(filePath, SpreadsheetDocumentType.Workbook))
+            bool success = false;
+            while (!success)
             {
-                // Add a new workbook
-                WorkbookPart workbookPart = spreadsheetDocument.AddWorkbookPart();
-                workbookPart.Workbook = new Workbook();
-
-                // Add a new worksheet to the workbook
-                WorksheetPart worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
-                worksheetPart.Worksheet = new Worksheet(new SheetData());
-
-                // Add a new sheet to the workbook
-                Sheets sheets = spreadsheetDocument.WorkbookPart.Workbook.AppendChild<Sheets>(new Sheets());
-                Sheet sheet = new Sheet() { Id = spreadsheetDocument.WorkbookPart.GetIdOfPart(worksheetPart), SheetId = 1, Name = "Sheet1" };
-                sheets.Append(sheet);
-
-                // Add the headers to the first row
-                SheetData sheetData = worksheetPart.Worksheet.GetFirstChild<SheetData>();
-                Row row = new Row();
-                foreach (string value in HEADERS)
+                try
                 {
-                    row.Append(CreateCell(value));
+
+                    memoryStream = new MemoryStream();
+                    // Create a new spreadsheet document
+                    using (SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Create(memoryStream, SpreadsheetDocumentType.Workbook))
+                    {
+                        // Add a new workbook
+                        WorkbookPart workbookPart = spreadsheetDocument.AddWorkbookPart();
+                        workbookPart.Workbook = new Workbook();
+
+                        // Add a new worksheet to the workbook
+                        WorksheetPart worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
+                        worksheetPart.Worksheet = new Worksheet(new SheetData());
+
+                        // Add a new sheet to the workbook
+                        Sheets sheets = spreadsheetDocument.WorkbookPart.Workbook.AppendChild<Sheets>(new Sheets());
+                        Sheet sheet = new Sheet() { Id = spreadsheetDocument.WorkbookPart.GetIdOfPart(worksheetPart), SheetId = 1, Name = "Sheet1" };
+                        sheets.Append(sheet);
+
+                        // Add the headers to the first row
+                        SheetData sheetData = worksheetPart.Worksheet.GetFirstChild<SheetData>();
+                        Row row = new Row();
+                        foreach (string value in HEADERS)
+                        {
+                            row.Append(CreateCell(value));
+                        }
+                        sheetData.Append(row);
+
+                        // Save the changes to the spreadsheet document
+                        workbookPart.Workbook.Save();
+
+                        // Set success to true to break out of the while loop
+                        success = true;
+                    }
+                    memoryStream.Position = 0;
                 }
-                sheetData.Append(row);
+                catch (System.IO.IOException ex)
+                {
+                    // Show an error message
+                    MessageBox.Show("Ne mogu pristupiti datoteci. Ako se već koristi u nekom programu zatvorite ju");
 
-                // Save the changes to the spreadsheet document
-                workbookPart.Workbook.Save();
-
-                // Set success to true to break out of the while loop
-                success = true;
-            }
-        }
-        catch (System.IO.IOException ex)
-        {
-            // Show an error message
-            MessageBox.Show("Ne mogu pristupiti datoteci. Ako se već koristi u nekom programu zatvorite ju");
-
-            // Wait for a short period before trying again
-            System.Threading.Thread.Sleep(1000);
-        }
+                    // Wait for a short period before trying again
+                    System.Threading.Thread.Sleep(1000);
+                }
     }
 }
 
