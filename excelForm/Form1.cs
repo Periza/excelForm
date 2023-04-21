@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -36,7 +37,8 @@ namespace ExcelForm
         // generiranje excel datoteke
         private void button1_Click(object sender, EventArgs e)
         {
-            string[] arguments = { "C:\\Sculptor\\bin\\kfserver.exe" };
+            Debug.WriteLine($"KfServerPath: {AppSettings.Instance.KfServerPath}");
+            string[] arguments = { "C:\\Sculptor1\\bin\\kfserver.exe" };
 
             if(sender == button1)
             {
@@ -53,8 +55,8 @@ namespace ExcelForm
         // generiranje pdf datoteka
         private void button2_Click(object sender, EventArgs e)
         {
-            string srepwcPath = @"C:\Sculptor\bin\srepw.exe";
-            string programPath = @"D:\Tehnon2023\tehnon23\generatePdf.q";
+            string srepwcPath = @"C:\Sculptor1\bin\srepw.exe";
+            string programPath = @"D:\Tehnon2022\tehnon22\generatePdf.q";
 
             // start
             pdfProcess = Process.Start($"{srepwcPath}", $"{programPath}");
@@ -101,8 +103,8 @@ namespace ExcelForm
         // imamo !file FILE_RACUN "tablica"
         private void izmjeniDatoteke()
         {
-            string filePath = @"D:\Tehnon2023\tehnon23\generatePdf.r";
-            string[] fileLines = File.ReadAllLines(filePath);
+            string path = @"D:\Tehnon2022\tehnon22\";
+            string[] fileLines = File.ReadAllLines($"{path}generatePdf.r", Encoding.GetEncoding(1250));
             int lineIndex = 15;
 
             string imeTablice = Path.GetFileNameWithoutExtension(databasePath);
@@ -110,47 +112,70 @@ namespace ExcelForm
             // sadržaj nove linije treba biti "!file FILE_RACUN "imeTablice""
             string newLineContent = $"!file FILE_RACUN \"{imeTablice}\"";
 
-            if(lineIndex < fileLines.Length)
+            if (lineIndex < fileLines.Length)
             {
                 fileLines[lineIndex] = newLineContent;
-                File.WriteAllLines(filePath, fileLines);
+                File.WriteAllLines($"{path}generatePdf.r", fileLines, Encoding.GetEncoding(1250));
             }
 
             // treba izmjeniti i napravi_racun datoteke
-            string path = @"D:\Tehnon2023\tehnon23\";
-            
+
+            lineIndex = 12;
 
             // za svaki element u nizu napravi_racun datoteka
-            foreach(string napravi_racun_file in napravi_racun_files)
+            foreach (string napravi_racun_file in napravi_racun_files)
             {
+                fileLines = File.ReadAllLines($"{path}{napravi_racun_file}", Encoding.GetEncoding(1250));
                 // svima je FILE_RACUN na 13. liniji
-                newLineContent = $"file FILE_RACUN \"{imeTablice}\"";
+                newLineContent = $"!file FILE_RACUN \"{imeTablice}\"";
 
                 if (lineIndex < fileLines.Length)
                 {
                     fileLines[lineIndex] = newLineContent;
-                    File.WriteAllLines($"{path}{napravi_racun_file}", fileLines);
+                    File.WriteAllLines($"{path}{napravi_racun_file}", fileLines, Encoding.GetEncoding(1250));
                 }
             }
-
         }
+
 
         private void compile()
         {
             // kompajliraj generate_pdf.r
-            string path = @"D:\Tehnon2023\tehnon23\";
-            string sccPath = @"C:\Sculptor\bin\scc.exe";
+            string path = @"D:\Tehnon2022\tehnon23\";
+            string sccPath = @"C:\Sculptor1\bin\scc.exe";
 
-            Process compileProcess = Process.Start(sccPath, $"{path}generatePdf.r");
+            var psi = new ProcessStartInfo(sccPath, $"{path}generatePdf.r")
+            {
+                WorkingDirectory = "D:\\Tehnon2022\\tehnon22"
+            };
+
+            Process compileProcess = Process.Start(psi);
+
+            
 
             compileProcess.WaitForExit();
+
+            Debug.WriteLine($"generatePdf.r compile: {compileProcess.ExitCode}");
 
             // kompaliraj sve napravi_racun datoteke
             foreach (string napravi_racun_file in napravi_racun_files)
             {
-                compileProcess = Process.Start(sccPath, $"{path}{napravi_racun_file}");
+                var asi = new ProcessStartInfo(sccPath, $"{path}{napravi_racun_file}")
+                {
+                    WorkingDirectory = "D:\\Tehnon2022\\tehnon22"
+                };
+
+                Debug.WriteLine($"{sccPath} {path}{napravi_racun_file}");
+
+                var process = Process.Start(asi);
+
+                process.WaitForExit();
+
+                Debug.WriteLine($"Exit code: {process.ExitCode}");
+                Debug.WriteLine("Compilation done");
             }
             
         }
+
     }
 }

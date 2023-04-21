@@ -70,6 +70,7 @@ namespace Export
         public static void start(string[] args, Label progressLabel, string databaseName)
         {
             Process[] pname = Process.GetProcessesByName("kfserver");
+            // AppSettings.Instance.SaveSettings();
 
             if (pname.Length == 0)
             {
@@ -81,7 +82,7 @@ namespace Export
                 }
                 else
                 {
-                    kfserverProcess = Process.Start("C:\\Sculptor\\bin\\kfserver.exe");
+                    kfserverProcess = Process.Start("C:\\Sculptor1\\bin\\kfserver.exe");
                 }
 
 
@@ -101,7 +102,16 @@ namespace Export
                 // Console.WriteLine("kfserver is already running");
             }
 
-            server = new Server(Dns.GetHostEntry(IPAddress.Loopback).HostName, 10);
+            try {
+                string hostname = "localhost";
+                Debug.WriteLine($"HOSTNAME : {hostname} <->");
+                server = new Server(hostname, 10);
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+            
 
             string projectPath;
 
@@ -111,28 +121,25 @@ namespace Export
             }
             else
             {
-                projectPath = "D:\\Tehnon2023\\tehnon23";
+                projectPath = "D:\\Tehnon2022\\tehnon22";
             }
 
-            database = new Database(server,
-                                    "baza",
-                                    Database.Type.SCULPTOR,
-                                    Database.Flag.IGNORE_CATALOG,
-                                    projectPath,
-                                    5,
-                                    "log.txt");
+            try
+            {
+                database = new Database(server,
+                                        "baza",
+                                        Database.Type.SCULPTOR,
+                                        Database.Flag.IGNORE_CATALOG,
+                                        projectPath,
+                                        5,
+                                        "log.txt");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Database error!");
+            }
 
-            /*
-            racun = database.openTable("racun14", KeyedFile.Mode.READ);
-            mat = database.openTable("mat", KeyedFile.Mode.READ);
-            mjul = database.openTable("mjul", KeyedFile.Mode.READ);
-            podst = database.openTable("podst", KeyedFile.Mode.READ);
-
-            // rewind all tables
-            racun.rewind();
-            mat.rewind();
-            mjul.rewind();
-            */
+ 
 
 
 
@@ -262,7 +269,7 @@ namespace Export
                         // make a new cell
                         Cell cell = new Cell();
                         cell.CellReference = "S" + i.ToString();
-                        string path = $"D:/Tehnon2023/pregled/racun{rowData[1]}_{year}.pdf";
+                        string path = $"D:/Tehnon2022/pregled10/racun{rowData[1]}_{year}.pdf";
 
                         if (File.Exists(path))
                         {
