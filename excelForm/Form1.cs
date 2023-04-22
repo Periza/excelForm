@@ -56,7 +56,7 @@ namespace ExcelForm
         private void button2_Click(object sender, EventArgs e)
         {
             string srepwcPath = @"C:\Sculptor1\bin\srepw.exe";
-            string programPath = @"D:\Tehnon2022\tehnon22\generatePdf.q";
+            string programPath = @"D:\Tehnon2023\tehnon23\generatePdf.q";
 
             // start
             pdfProcess = Process.Start($"{srepwcPath}", $"{programPath}");
@@ -103,7 +103,7 @@ namespace ExcelForm
         // imamo !file FILE_RACUN "tablica"
         private void izmjeniDatoteke()
         {
-            string path = @"D:\Tehnon2022\tehnon22\";
+            string path = @"D:\Tehnon2023\tehnon23\";
             string[] fileLines = File.ReadAllLines($"{path}generatePdf.r", Encoding.GetEncoding(1250));
             int lineIndex = 15;
 
@@ -141,12 +141,12 @@ namespace ExcelForm
         private void compile()
         {
             // kompajliraj generate_pdf.r
-            string path = @"D:\Tehnon2022\tehnon23\";
+            string path = @"D:\Tehnon2023\tehnon23\";
             string sccPath = @"C:\Sculptor1\bin\scc.exe";
 
             var psi = new ProcessStartInfo(sccPath, $"{path}generatePdf.r")
             {
-                WorkingDirectory = "D:\\Tehnon2022\\tehnon22"
+                WorkingDirectory = "D:\\Tehnon2023\\tehnon23"
             };
 
             Process compileProcess = Process.Start(psi);
@@ -155,6 +155,11 @@ namespace ExcelForm
 
             compileProcess.WaitForExit();
 
+            if(compileProcess.ExitCode != 0)
+            {
+                throw new Exception("Error with compilation");
+            }
+
             Debug.WriteLine($"generatePdf.r compile: {compileProcess.ExitCode}");
 
             // kompaliraj sve napravi_racun datoteke
@@ -162,7 +167,7 @@ namespace ExcelForm
             {
                 var asi = new ProcessStartInfo(sccPath, $"{path}{napravi_racun_file}")
                 {
-                    WorkingDirectory = "D:\\Tehnon2022\\tehnon22"
+                    WorkingDirectory = "D:\\Tehnon2023\\tehnon23"
                 };
 
                 Debug.WriteLine($"{sccPath} {path}{napravi_racun_file}");
@@ -170,6 +175,11 @@ namespace ExcelForm
                 var process = Process.Start(asi);
 
                 process.WaitForExit();
+
+                if(process.ExitCode != 0)
+                {
+                    throw new Exception("Error with compilation");
+                }
 
                 Debug.WriteLine($"Exit code: {process.ExitCode}");
                 Debug.WriteLine("Compilation done");

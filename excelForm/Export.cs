@@ -212,7 +212,7 @@ namespace Export
             progressLabel.Refresh();
 
             CreateExcelFile(fileName);
-            FillDatabase(fileName, data);
+            FillDatabase(fileName, data, databaseName);
 
             progressLabel.Text = "Gotovo";
             progressLabel.Refresh();
@@ -238,7 +238,7 @@ namespace Export
             }
         }
 
-        public static void FillDatabase(string filePath, List<List<object>> data)
+        public static void FillDatabase(string filePath, List<List<object>> data, string databaseName)
         {
             using (SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Open(memoryStream, true))
             {
@@ -262,14 +262,15 @@ namespace Export
                     try
                     {
                         // get year
-                        KeyedFile racun = database.openTable("racun14", KeyedFile.Mode.READ);
+                        KeyedFile racun = database.openTable(databaseName, KeyedFile.Mode.READ);
                         racun.next();
                         string[] date = racun.getField("rr_dp").getString().Split('.');
                         int year = int.Parse(date[date.Length - 1]);
+                        int month = int.Parse(date[date.Length - 2]);
                         // make a new cell
                         Cell cell = new Cell();
                         cell.CellReference = "S" + i.ToString();
-                        string path = $"D:/Tehnon2022/pregled10/racun{rowData[1]}_{year}.pdf";
+                        string path = $"D:/Tehnon2022/pregled{month}/racun{rowData[1]}_{year}.pdf";
 
                         if (File.Exists(path))
                         {
