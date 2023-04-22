@@ -38,7 +38,7 @@ namespace ExcelForm
         private void button1_Click(object sender, EventArgs e)
         {
             Debug.WriteLine($"KfServerPath: {AppSettings.Instance.KfServerPath}");
-            string[] arguments = { "C:\\Sculptor1\\bin\\kfserver.exe" };
+            string[] arguments = { $"{AppSettings.Instance.SculptorPath}\\bin\\kfserver.exe" };
 
             if(sender == button1)
             {
@@ -55,8 +55,8 @@ namespace ExcelForm
         // generiranje pdf datoteka
         private void button2_Click(object sender, EventArgs e)
         {
-            string srepwcPath = @"C:\Sculptor1\bin\srepw.exe";
-            string programPath = @"D:\Tehnon2023\tehnon23\generatePdf.q";
+            string srepwcPath = $"{AppSettings.Instance.SculptorPath}\\bin\\srepw.exe";
+            string programPath = $"{AppSettings.Instance.ProjectPath}\\generatePdf.q";
 
             // start
             pdfProcess = Process.Start($"{srepwcPath}", $"{programPath}");
@@ -67,8 +67,10 @@ namespace ExcelForm
         // odabir baze podataka
         private void button3_Click(object sender, EventArgs e)
         {
+            Debug.WriteLine("button 3 click");
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
+                Debug.WriteLine("open file dialog");
                 // Set the file extension filter
                 openFileDialog.Filter = "D files|*.d";
 
@@ -77,7 +79,7 @@ namespace ExcelForm
 
                 if (result == DialogResult.OK) // The user selected a file
                 {
-                    
+                    Debug.WriteLine("dialog OK");
                     // ako je novi database path drugačiji od promijeni ga
                     if (openFileDialog.FileName != databasePath)
                     {
@@ -103,11 +105,23 @@ namespace ExcelForm
         // imamo !file FILE_RACUN "tablica"
         private void izmjeniDatoteke()
         {
-            string path = @"D:\Tehnon2023\tehnon23\";
-            string[] fileLines = File.ReadAllLines($"{path}generatePdf.r", Encoding.GetEncoding(1250));
+            Debug.WriteLine("izmjeni datoteke");
+            string path = $"{AppSettings.Instance.ProjectPath}";
+            string[] fileLines = {"" };
+            Debug.WriteLine(path);
+            try
+            {
+                fileLines = File.ReadAllLines($"{path}\\generatePdf.r", Encoding.GetEncoding(1250));
+            } catch(Exception ex)
+            {
+                Debug.WriteLine("exception reading all lines");
+                Debug.WriteLine($"{path}\\generatePdf.r");
+            }
             int lineIndex = 15;
 
             string imeTablice = Path.GetFileNameWithoutExtension(databasePath);
+
+            Debug.WriteLine("izmjeni tablice 2");
 
             // sadržaj nove linije treba biti "!file FILE_RACUN "imeTablice""
             string newLineContent = $"!file FILE_RACUN \"{imeTablice}\"";
@@ -115,7 +129,7 @@ namespace ExcelForm
             if (lineIndex < fileLines.Length)
             {
                 fileLines[lineIndex] = newLineContent;
-                File.WriteAllLines($"{path}generatePdf.r", fileLines, Encoding.GetEncoding(1250));
+                File.WriteAllLines($"{path}\\generatePdf.r", fileLines, Encoding.GetEncoding(1250));
             }
 
             // treba izmjeniti i napravi_racun datoteke
@@ -125,14 +139,14 @@ namespace ExcelForm
             // za svaki element u nizu napravi_racun datoteka
             foreach (string napravi_racun_file in napravi_racun_files)
             {
-                fileLines = File.ReadAllLines($"{path}{napravi_racun_file}", Encoding.GetEncoding(1250));
+                fileLines = File.ReadAllLines($"{path}\\{napravi_racun_file}", Encoding.GetEncoding(1250));
                 // svima je FILE_RACUN na 13. liniji
                 newLineContent = $"!file FILE_RACUN \"{imeTablice}\"";
 
                 if (lineIndex < fileLines.Length)
                 {
                     fileLines[lineIndex] = newLineContent;
-                    File.WriteAllLines($"{path}{napravi_racun_file}", fileLines, Encoding.GetEncoding(1250));
+                    File.WriteAllLines($"{path}\\{napravi_racun_file}", fileLines, Encoding.GetEncoding(1250));
                 }
             }
         }
@@ -140,13 +154,13 @@ namespace ExcelForm
 
         private void compile()
         {
+            Debug.WriteLine("compile");
             // kompajliraj generate_pdf.r
-            string path = @"D:\Tehnon2023\tehnon23\";
-            string sccPath = @"C:\Sculptor1\bin\scc.exe";
-
-            var psi = new ProcessStartInfo(sccPath, $"{path}generatePdf.r")
+            string path = $"{AppSettings.Instance.ProjectPath}";
+            string sccPath = $"{AppSettings.Instance.SculptorPath}\\bin\\scc.exe";
+            var psi = new ProcessStartInfo(sccPath, $"{path}\\generatePdf.r")
             {
-                WorkingDirectory = "D:\\Tehnon2023\\tehnon23"
+                WorkingDirectory = path
             };
 
             Process compileProcess = Process.Start(psi);
@@ -157,7 +171,7 @@ namespace ExcelForm
 
             if(compileProcess.ExitCode != 0)
             {
-                throw new Exception("Error with compilation");
+                throw new Exception("Error with compilation generatePdf.r");
             }
 
             Debug.WriteLine($"generatePdf.r compile: {compileProcess.ExitCode}");
@@ -165,12 +179,12 @@ namespace ExcelForm
             // kompaliraj sve napravi_racun datoteke
             foreach (string napravi_racun_file in napravi_racun_files)
             {
-                var asi = new ProcessStartInfo(sccPath, $"{path}{napravi_racun_file}")
+                var asi = new ProcessStartInfo(sccPath, $"{path}\\{napravi_racun_file}")
                 {
-                    WorkingDirectory = "D:\\Tehnon2023\\tehnon23"
+                    WorkingDirectory = path
                 };
+                
 
-                Debug.WriteLine($"{sccPath} {path}{napravi_racun_file}");
 
                 var process = Process.Start(asi);
 
