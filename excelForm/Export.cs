@@ -82,7 +82,7 @@ namespace Export
                 }
                 else
                 {
-                    kfserverProcess = Process.Start("C:\\Sculptor1\\bin\\kfserver.exe");
+                    kfserverProcess = Process.Start(AppSettings.Instance.KfServerPath);
                 }
 
 
@@ -121,7 +121,7 @@ namespace Export
             }
             else
             {
-                projectPath = "D:\\Tehnon2022\\tehnon22";
+                projectPath = AppSettings.Instance.ProjectPath;
             }
 
             try
@@ -270,17 +270,9 @@ namespace Export
                         // make a new cell
                         Cell cell = new Cell();
                         cell.CellReference = "S" + i.ToString();
-                        string path = $"D:/Tehnon2022/pregled{month}/racun{rowData[1]}_{year}.pdf";
+                        string path = $"pregled{month}/racun{rowData[1]}_{year}.pdf";
 
-                        if (File.Exists(path))
-                        {
-                            cell.CellFormula = new CellFormula($"HYPERLINK(\"{path}\",\"racun{rowData[1]}_{year}.pdf\")");
-                        }
-                        else
-                        {
-                            cell.CellValue = new CellValue("NE POSTOJI GENERIRANI RAČUN");
-                            cell.DataType = cellType;
-                        }
+                        cell.CellFormula = new CellFormula($"HYPERLINK(\"{path}\",\"racun{rowData[1]}_{year}.pdf\")");
                         row.Append(cell);
                         sheetData.Append(row);
                         i++;
