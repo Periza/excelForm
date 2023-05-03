@@ -124,6 +124,11 @@ namespace Export
                 projectPath = AppSettings.Instance.ProjectPath;
             }
 
+            /* edit the line from dd.mm.yyyy
+             * to dd.MM.yyyy so it does not throw an exception
+             */
+            Helpers.editLine(databaseName, "rr_dp");
+
             try
             {
                 database = new Database(server,
@@ -452,6 +457,8 @@ namespace Export
 
             return entries;
         }
+
+        
     }
 
 
