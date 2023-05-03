@@ -30,8 +30,8 @@ namespace ExcelForm
             InitializeComponent();
 
             // Onemogući buttone koji će biti kasnije omgućeni kada se odabere datoteka
-            button1.Enabled = false;
-            button2.Enabled = false;
+            button_GenerirajExcelDat.Enabled = false;
+            button_GenerirajPDF.Enabled = false;
 
         }
         // generiranje excel datoteke
@@ -40,16 +40,16 @@ namespace ExcelForm
             Debug.WriteLine($"KfServerPath: {AppSettings.Instance.KfServerPath}");
             string[] arguments = { $"{AppSettings.Instance.SculptorPath}\\bin\\kfserver.exe" };
 
-            if(sender == button1)
+            if(sender == button_GenerirajExcelDat)
             {
-                button1.Enabled = false;
+                button_GenerirajExcelDat.Enabled = false;
             }
             
             Export.Export.start(arguments, label1, Path.GetFileNameWithoutExtension(databasePath));
 
             Debug.WriteLine("Gotov");
 
-            button1.Enabled = true;
+            button_GenerirajExcelDat.Enabled = true;
         }
 
         // generiranje pdf datoteka
@@ -95,8 +95,8 @@ namespace ExcelForm
 
                     }
                    
-                    button1.Enabled = true;
-                    button2.Enabled = true;
+                    button_GenerirajExcelDat.Enabled = true;
+                    button_GenerirajPDF.Enabled = true;
                 }
             }
         }
