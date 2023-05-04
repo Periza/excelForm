@@ -53,8 +53,14 @@ namespace ExcelForm
         }
 
         // generiranje pdf datoteka
-        private void button2_Click(object sender, EventArgs e)
+        private void generatePdf_Click(object sender, EventArgs e)
         {
+            /* If the folder does dot exist when Sculptor generates pdf-s
+             * the program will "hang" untill someone manualy creates it
+             * so will do it in a function
+             */
+
+
             string srepwcPath = $"{AppSettings.Instance.SculptorPath}\\bin\\srepw.exe";
             string programPath = $"{AppSettings.Instance.ProjectPath}\\generatePdf.q";
 

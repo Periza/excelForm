@@ -14,6 +14,8 @@ public sealed class AppSettings
     public string SculptorPath { get; set; }
     public string ProjectPath { get; set; }
 
+    public string TehnonPath { get; set; }
+
     private AppSettings()
     {
         Debug.WriteLine("app settings");
@@ -27,7 +29,8 @@ public sealed class AppSettings
             var defaultSettings = new AppSettings
             {
                 KfServerPath = @"C:\Sculptor1\bin\kfserver.exe",
-                ProjectPath = @"D:\Tehnon2022\tehnon22",
+                ProjectPath = @"D:\Tehnon2023\tehnon23",
+                TehnonPath = @"D:\Tehnon2023",
                 SculptorPath = @"C:\Sculptor1"
             };
             SaveSettings(defaultSettings);

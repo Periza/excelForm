@@ -57,13 +57,14 @@
             // 
             // button_GenerirajPDF
             // 
-            this.button_GenerirajPDF.Location = new System.Drawing.Point(50, 113);
-            this.button_GenerirajPDF.Name = "button_GenerirajPDF";
-            this.button_GenerirajPDF.Size = new System.Drawing.Size(110, 51);
-            this.button_GenerirajPDF.TabIndex = 2;
-            this.button_GenerirajPDF.Text = "Generiraj PDF-ove";
-            this.button_GenerirajPDF.UseVisualStyleBackColor = true;
-            this.button_GenerirajPDF.Click += new System.EventHandler(this.button2_Click);
+            this.button2.Location = new System.Drawing.Point(75, 174);
+            this.button2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(165, 78);
+            this.button2.TabIndex = 2;
+            this.button2.Text = "Generiraj PDF-ove";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.generatePdf_Click);
             // 
             // label2
             // 
