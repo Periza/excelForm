@@ -23,7 +23,7 @@ namespace ExcelForm
 
         private static string databasePath;
 
-        private static string[] napravi_racun_files = { "napravi_racun.r", "napravi_racun10.r", "napravi_racun11.r" };
+        private static string[] napravi_racun_files = { "napravi_racun.r" };
 
         public Form1()
         {
