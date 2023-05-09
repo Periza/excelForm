@@ -6,13 +6,15 @@ using Newtonsoft.Json.Serialization;
 
 public sealed class AppSettings
 {
-    private static readonly Lazy<AppSettings> lazy = new Lazy<AppSettings>(() => LoadSettings());
+    private static  Lazy<AppSettings> lazy = new Lazy<AppSettings>(() => LoadSettings());
 
     public static AppSettings Instance { get { return lazy.Value; } }
 
     public string KfServerPath { get; set; }
     public string SculptorPath { get; set; }
     public string ProjectPath { get; set; }
+
+    public string TehnonPath { get; set; }
 
     private AppSettings()
     {
@@ -27,7 +29,8 @@ public sealed class AppSettings
             var defaultSettings = new AppSettings
             {
                 KfServerPath = @"C:\Sculptor1\bin\kfserver.exe",
-                ProjectPath = @"D:\Tehnon2022\tehnon22",
+                ProjectPath = @"D:\Tehnon2023\tehnon23",
+                TehnonPath = @"D:\Tehnon2023",
                 SculptorPath = @"C:\Sculptor1"
             };
             SaveSettings(defaultSettings);
@@ -55,5 +58,17 @@ public sealed class AppSettings
             };
             serializer.Serialize(jsonWriter, settings);
         }
+    }
+    public static void SaveSettings(string kfServer, string sculptor, string project, string tehnon)
+    {
+        var tempSettings = new AppSettings
+        {
+            KfServerPath = kfServer,
+            ProjectPath = project,
+            TehnonPath = tehnon,
+            SculptorPath = sculptor
+        };
+        SaveSettings(tempSettings);
+        lazy = new Lazy<AppSettings>(() => LoadSettings());
     }
 }

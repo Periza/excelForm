@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Sculptor.KfLibDNet;
+﻿using Sculptor.KfLibDNet;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -206,24 +205,6 @@ namespace ExcelForm
                 Debug.WriteLine("Compilation done");
             }
             
-        }
-
-        /// <summary>
-        /// kreiranje novog forma za promjenu appsettings.json
-        /// </summary>
-        private void settingsButton_Click(object sender, EventArgs e)
-        {
-            string fileName = "appsettings.json";
-            string path = Path.Combine(Environment.CurrentDirectory, fileName);
-
-            if (!File.Exists(path))
-            {
-                Debug.WriteLine($"Path {path} does not exist");
-                return;
-            }
-
-            Form form = new ChangeAppSettings(path);
-            form.ShowDialog();
         }
 
     }
