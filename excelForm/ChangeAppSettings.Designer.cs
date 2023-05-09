@@ -117,7 +117,7 @@
             // saveButton
             // 
             this.saveButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.saveButton.Location = new System.Drawing.Point(144, 287);
+            this.saveButton.Location = new System.Drawing.Point(166, 282);
             this.saveButton.Name = "saveButton";
             this.saveButton.Size = new System.Drawing.Size(100, 34);
             this.saveButton.TabIndex = 9;
