@@ -33,6 +33,7 @@
             this.button_GenerirajPDF = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.button_OdaberiBazu = new System.Windows.Forms.Button();
+            this.settingsButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button_GenerirajExcelDat
@@ -70,7 +71,7 @@
             this.label2.Location = new System.Drawing.Point(58, 43);
             this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(146, 20);
+            this.label2.Size = new System.Drawing.Size(98, 13);
             this.label2.TabIndex = 3;
             this.label2.Text = "Baza nije odabrana";
             // 
@@ -84,11 +85,22 @@
             this.button_OdaberiBazu.UseVisualStyleBackColor = true;
             this.button_OdaberiBazu.Click += new System.EventHandler(this.button3_Click);
             // 
+            // settingsButton
+            // 
+            this.settingsButton.Image = global::ExcelForm.Properties.Resources.setting__2_;
+            this.settingsButton.Location = new System.Drawing.Point(757, 552);
+            this.settingsButton.Name = "settingsButton";
+            this.settingsButton.Size = new System.Drawing.Size(44, 34);
+            this.settingsButton.TabIndex = 5;
+            this.settingsButton.UseVisualStyleBackColor = true;
+            this.settingsButton.Click += new System.EventHandler(this.settingsButton_Click_1);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(844, 609);
+            this.Controls.Add(this.settingsButton);
             this.Controls.Add(this.button_OdaberiBazu);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.button_GenerirajPDF);
@@ -108,6 +120,7 @@
         private System.Windows.Forms.Button button_GenerirajPDF;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button_OdaberiBazu;
+        private System.Windows.Forms.Button settingsButton;
     }
 }
 

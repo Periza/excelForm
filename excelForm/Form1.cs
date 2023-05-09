@@ -211,7 +211,7 @@ namespace ExcelForm
         /// <summary>
         /// kreiranje novog forma za promjenu appsettings.json
         /// </summary>
-        private void settingsButton_Click(object sender, EventArgs e)
+        private void settingsButton_Click_1(object sender, EventArgs e)
         {
             string fileName = "appsettings.json";
             string path = Path.Combine(Environment.CurrentDirectory, fileName);
@@ -225,6 +225,5 @@ namespace ExcelForm
             Form form = new ChangeAppSettings(path);
             form.ShowDialog();
         }
-
     }
 }
