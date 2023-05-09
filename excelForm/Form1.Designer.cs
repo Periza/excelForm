@@ -28,71 +28,75 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
+            this.button_GenerirajExcelDat = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
+            this.button_GenerirajPDF = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
-            this.button3 = new System.Windows.Forms.Button();
+            this.button_odaberiBazu = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // button1
+            // button_GenerirajExcelDat
             // 
-            this.button1.Location = new System.Drawing.Point(75, 358);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(165, 78);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "Generiraj excel datoteku";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button_GenerirajExcelDat.Location = new System.Drawing.Point(50, 233);
+            this.button_GenerirajExcelDat.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.button_GenerirajExcelDat.Name = "button_GenerirajExcelDat";
+            this.button_GenerirajExcelDat.Size = new System.Drawing.Size(110, 51);
+            this.button_GenerirajExcelDat.TabIndex = 0;
+            this.button_GenerirajExcelDat.Text = "Generiraj excel datoteku";
+            this.button_GenerirajExcelDat.UseVisualStyleBackColor = true;
+            this.button_GenerirajExcelDat.Click += new System.EventHandler(this.button1_Click);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(439, 374);
+            this.label1.Location = new System.Drawing.Point(293, 243);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(0, 20);
+            this.label1.Size = new System.Drawing.Size(0, 13);
             this.label1.TabIndex = 1;
             // 
-            // button2
+            // button_GenerirajPDF
             // 
-            this.button2.Location = new System.Drawing.Point(75, 174);
-            this.button2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(165, 78);
-            this.button2.TabIndex = 2;
-            this.button2.Text = "Generiraj PDF-ove";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.button_GenerirajPDF.Location = new System.Drawing.Point(50, 113);
+            this.button_GenerirajPDF.Name = "button_GenerirajPDF";
+            this.button_GenerirajPDF.Size = new System.Drawing.Size(110, 51);
+            this.button_GenerirajPDF.TabIndex = 2;
+            this.button_GenerirajPDF.Text = "Generiraj PDF-ove";
+            this.button_GenerirajPDF.UseVisualStyleBackColor = true;
+            this.button_GenerirajPDF.Click += new System.EventHandler(this.button2_Click);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(87, 66);
+            this.label2.Location = new System.Drawing.Point(58, 43);
+            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(219, 30);
+            this.label2.Size = new System.Drawing.Size(98, 13);
             this.label2.TabIndex = 3;
             this.label2.Text = "Baza nije odabrana";
             // 
-            // button3
+            // button_odaberiBazu
             // 
-            this.button3.Location = new System.Drawing.Point(580, 57);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(201, 38);
-            this.button3.TabIndex = 4;
-            this.button3.Text = "Odaberi bazu";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.button_odaberiBazu.Location = new System.Drawing.Point(387, 37);
+            this.button_odaberiBazu.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.button_odaberiBazu.Name = "button_odaberiBazu";
+            this.button_odaberiBazu.Size = new System.Drawing.Size(134, 25);
+            this.button_odaberiBazu.TabIndex = 4;
+            this.button_odaberiBazu.Text = "Odaberi bazu";
+            this.button_odaberiBazu.UseVisualStyleBackColor = true;
+            this.button_odaberiBazu.Click += new System.EventHandler(this.button3_Click);
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(844, 609);
-            this.Controls.Add(this.button3);
+            this.ClientSize = new System.Drawing.Size(563, 396);
+            this.Controls.Add(this.button_odaberiBazu);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.button2);
+            this.Controls.Add(this.button_GenerirajPDF);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.button_GenerirajExcelDat);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "Form1";
             this.Text = "Generiraj PDF i excel";
             this.ResumeLayout(false);
@@ -102,11 +106,11 @@
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button_GenerirajExcelDat;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button_GenerirajPDF;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button_odaberiBazu;
     }
 }
 
