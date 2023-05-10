@@ -38,6 +38,7 @@ namespace ExcelForm
         // generiranje excel datoteke
         private void button1_Click(object sender, EventArgs e)
         {
+            Cursor.Current =  Cursors.WaitCursor;
             Debug.WriteLine($"KfServerPath: {AppSettings.Instance.KfServerPath}");
             string[] arguments = { $"{AppSettings.Instance.SculptorPath}\\bin\\kfserver.exe" };
 
@@ -51,6 +52,8 @@ namespace ExcelForm
             Debug.WriteLine("Gotov");
 
             button_GenerirajExcelDat.Enabled = true;
+
+            Cursor.Current = Cursors.Default;
         }
 
         // generiranje pdf datoteka
@@ -60,7 +63,7 @@ namespace ExcelForm
              * the program will "hang" untill someone manualy creates it
              * so will do it in a function
              */
-
+            Cursor.Current = Cursors.WaitCursor;
 
             string srepwcPath = $"{AppSettings.Instance.SculptorPath}\\bin\\srepw.exe";
             string programPath = $"{AppSettings.Instance.ProjectPath}\\generatePdf.q";
@@ -68,7 +71,7 @@ namespace ExcelForm
             // start
             pdfProcess = Process.Start($"{srepwcPath}", $"{programPath}");
             pdfProcess.WaitForExit();
-
+            Cursor.Current = Cursors.Default;
         }
 
         // odabir baze podataka
