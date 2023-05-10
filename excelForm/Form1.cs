@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -35,6 +36,7 @@ namespace ExcelForm
             button_GenerirajPDF.Enabled = false;
 
         }
+       
         // generiranje excel datoteke
         private void button1_Click(object sender, EventArgs e)
         {
