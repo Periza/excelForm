@@ -225,5 +225,7 @@ namespace ExcelForm
             Form form = new ChangeAppSettings(path);
             form.ShowDialog();
         }
+
+      
     }
 }
