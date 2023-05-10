@@ -1,10 +1,12 @@
-﻿using Sculptor.KfLibDNet;
+﻿using Newtonsoft.Json;
+using Sculptor.KfLibDNet;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -34,9 +36,11 @@ namespace ExcelForm
             button_GenerirajPDF.Enabled = false;
 
         }
+       
         // generiranje excel datoteke
         private void button1_Click(object sender, EventArgs e)
         {
+            Cursor.Current =  Cursors.WaitCursor;
             Debug.WriteLine($"KfServerPath: {AppSettings.Instance.KfServerPath}");
             string[] arguments = { $"{AppSettings.Instance.SculptorPath}\\bin\\kfserver.exe" };
 
@@ -50,6 +54,8 @@ namespace ExcelForm
             Debug.WriteLine("Gotov");
 
             button_GenerirajExcelDat.Enabled = true;
+
+            Cursor.Current = Cursors.Default;
         }
 
         // generiranje pdf datoteka
@@ -59,7 +65,7 @@ namespace ExcelForm
              * the program will "hang" untill someone manualy creates it
              * so will do it in a function
              */
-
+            Cursor.Current = Cursors.WaitCursor;
 
             string srepwcPath = $"{AppSettings.Instance.SculptorPath}\\bin\\srepw.exe";
             string programPath = $"{AppSettings.Instance.ProjectPath}\\generatePdf.q";
@@ -67,7 +73,7 @@ namespace ExcelForm
             // start
             pdfProcess = Process.Start($"{srepwcPath}", $"{programPath}");
             pdfProcess.WaitForExit();
-
+            Cursor.Current = Cursors.Default;
         }
 
         // odabir baze podataka
@@ -207,5 +213,24 @@ namespace ExcelForm
             
         }
 
+        /// <summary>
+        /// kreiranje novog forma za promjenu appsettings.json
+        /// </summary>
+        private void settingsButton_Click_1(object sender, EventArgs e)
+        {
+            string fileName = "appsettings.json";
+            string path = Path.Combine(Environment.CurrentDirectory, fileName);
+
+            if (!File.Exists(path))
+            {
+                Debug.WriteLine($"Path {path} does not exist");
+                return;
+            }
+
+            Form form = new ChangeAppSettings(path);
+            form.ShowDialog();
+        }
+
+      
     }
 }

@@ -6,7 +6,7 @@ using Newtonsoft.Json.Serialization;
 
 public sealed class AppSettings
 {
-    private static readonly Lazy<AppSettings> lazy = new Lazy<AppSettings>(() => LoadSettings());
+    private static  Lazy<AppSettings> lazy = new Lazy<AppSettings>(() => LoadSettings());
 
     public static AppSettings Instance { get { return lazy.Value; } }
 
@@ -58,5 +58,17 @@ public sealed class AppSettings
             };
             serializer.Serialize(jsonWriter, settings);
         }
+    }
+    public static void SaveSettings(string kfServer, string sculptor, string project, string tehnon)
+    {
+        var tempSettings = new AppSettings
+        {
+            KfServerPath = kfServer,
+            ProjectPath = project,
+            TehnonPath = tehnon,
+            SculptorPath = sculptor
+        };
+        SaveSettings(tempSettings);
+        lazy = new Lazy<AppSettings>(() => LoadSettings());
     }
 }
