@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ChangeAppSettings));
             this.label1 = new System.Windows.Forms.Label();
             this.kfServerPathLabel = new System.Windows.Forms.Label();
             this.sculptorPathLabel = new System.Windows.Forms.Label();
@@ -186,6 +187,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(385, 327);
             this.Controls.Add(this.tableLayoutPanel1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(250, 250);
             this.Name = "ChangeAppSettings";
             this.Text = "ChangeAppSettings";
