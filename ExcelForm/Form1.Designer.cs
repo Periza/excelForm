@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.button_GenerirajExcelDat = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.button_GenerirajPDF = new System.Windows.Forms.Button();
@@ -137,6 +138,7 @@
             this.ClientSize = new System.Drawing.Size(605, 413);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.label1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(350, 350);
             this.Name = "Form1";
             this.Text = "Generiraj PDF i excel";
