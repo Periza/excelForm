@@ -88,7 +88,7 @@
             // settingsButton
             // 
             this.settingsButton.Image = global::ExcelForm.Properties.Resources.setting__2_;
-            this.settingsButton.Location = new System.Drawing.Point(757, 552);
+            this.settingsButton.Location = new System.Drawing.Point(788, 12);
             this.settingsButton.Name = "settingsButton";
             this.settingsButton.Size = new System.Drawing.Size(44, 34);
             this.settingsButton.TabIndex = 5;
