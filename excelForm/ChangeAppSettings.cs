@@ -1,13 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ExcelForm
@@ -38,17 +31,21 @@ namespace ExcelForm
         /// </summary>
         private void saveData()
         {
-            string kfServer = "", sculptor = "", project = "", tehnon = ""; 
-            if (!string.IsNullOrEmpty(kfServerPathTb.Text)){
+            string kfServer = "", sculptor = "", project = "", tehnon = "";
+            if (!string.IsNullOrEmpty(kfServerPathTb.Text))
+            {
                 kfServer = kfServerPathTb.Text;
             }
-            if (!string.IsNullOrEmpty(sculptorPathTb.Text)){
+            if (!string.IsNullOrEmpty(sculptorPathTb.Text))
+            {
                 sculptor = sculptorPathTb.Text;
             }
-            if (!string.IsNullOrEmpty(projectPathTb.Text)){
+            if (!string.IsNullOrEmpty(projectPathTb.Text))
+            {
                 project = projectPathTb.Text;
             }
-            if (!string.IsNullOrEmpty(tehnonPathTb.Text)){
+            if (!string.IsNullOrEmpty(tehnonPathTb.Text))
+            {
                 tehnon = tehnonPathTb.Text;
             }
 
@@ -85,6 +82,6 @@ namespace ExcelForm
             return item;
         }
 
-       
+
     }
 }

@@ -1,21 +1,7 @@
-﻿using Microsoft.CSharp;
-using Newtonsoft.Json;
-using Sculptor.KfLibDNet;
-using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Runtime.Remoting.Messaging;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ExcelForm
@@ -32,7 +18,7 @@ namespace ExcelForm
         public Form1()
         {
             InitializeComponent();
-
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             // Onemogući buttone koji će biti kasnije omgućeni kada se odabere datoteka
             button_GenerirajExcelDat.Enabled = false;
             button_GenerirajPDF.Enabled = false;
@@ -234,7 +220,6 @@ namespace ExcelForm
 
             Compile();
 
-            MessageBox.Show("Compiled");
         }
     }
 }
