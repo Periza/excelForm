@@ -136,10 +136,14 @@ namespace ExcelForm
                     Debug.WriteLine(rac.obracunsko_mjerno_mjesto_voda);
                     rac.rr_rn = racun.getField("rr_rn").getString();
                     rac.interni_broj_racuna = racun.getField("rr_rn").getString();
-                    rac.krajnji_kupac = mat.getField("m_ime").getString();
+                    //rac.krajnji_kupac = mat.getField("m_ime").getString();
+                    rac.krajnji_kupac = Encoding.GetEncoding(1250).GetString(mat.getField("m_ime").getBinary());
+                    //MessageBox.Show(Encoding.GetEncoding(1250).GetString(mat.getField("m_ime").getBinary()));
+
                     rac.OIB = mat.getField("m_oib").getString();
                     rac.namjena = rac.obracunsko_mjerno_mjesto_voda != "0" ? "GRIJANJE - PTV" : "GRIJANJE";
-                    rac.adresa_obracunskog_mjernog_mjesta = $"{mjul.getField("mu_uln").getString()} {mat.getField("m_sub").getString()}";
+                    rac.adresa_obracunskog_mjernog_mjesta = $"{Encoding.GetEncoding(1250).GetString(mjul.getField("mu_uln").getBinary())} {mat.getField("m_sub").getString()}";
+                    
                     rac.grad_omm = "VUKOVAR";
 
                     rac.naziv_toplinskog_sustava = rac.toplinski_sustav.Substring(0, 1)[0] == 'C' ? "C" : "Z";
