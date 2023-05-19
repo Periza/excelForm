@@ -1,6 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.CSharp;
+using Newtonsoft.Json;
 using Sculptor.KfLibDNet;
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -101,7 +103,7 @@ namespace ExcelForm
                         // uredi datoteku
                         izmjeniDatoteke();
                         // kompajliraj uređeni file koristeći scc
-                        compile();
+                        Compile();
 
 
 
@@ -164,7 +166,7 @@ namespace ExcelForm
         }
 
 
-        private void compile()
+        private void Compile()
         {
             Debug.WriteLine("compile");
             // kompajliraj generate_pdf.r
@@ -229,8 +231,10 @@ namespace ExcelForm
 
             Form form = new ChangeAppSettings(path);
             form.ShowDialog();
-        }
 
-      
+            Compile();
+
+            MessageBox.Show("Compiled");
+        }
     }
 }
