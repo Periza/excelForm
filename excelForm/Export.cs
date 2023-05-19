@@ -159,7 +159,7 @@ namespace Export
 
             progressLabel.Text = "Prikupljanje podataka iz baze...";
             progressLabel.Refresh();
-
+            Cursor.Current = Cursors.WaitCursor;
             while (true)
             {
                 
@@ -218,6 +218,8 @@ namespace Export
 
             CreateExcelFile(fileName);
             FillDatabase(fileName, data, databaseName);
+
+            Cursor.Current = Cursors.Default;
 
             progressLabel.Text = "Gotovo";
             progressLabel.Refresh();
@@ -333,7 +335,10 @@ namespace Export
             row.Append(sumUkupanIznosRacunaNakonUmanjenjaCell);
             row.Append(sumIznosRazlikeCell);
             sheetData.Append(row);
-            
+            sumIznosRazlike = 0;
+            sumUkupanIznosRacuna = 0;
+            sumUkupanIznosRacunaNakonUmanjenja = 0;
+            sumIsporucenaToplinskaEnergija = 0;
         }
 
 
