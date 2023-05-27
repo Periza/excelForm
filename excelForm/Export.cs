@@ -69,6 +69,7 @@ namespace Export
         };
         public static void start(string[] args, Label progressLabel, string databaseName)
         {
+
             Process[] pname = Process.GetProcessesByName("kfserver");
             // AppSettings.Instance.SaveSettings();
 
@@ -153,6 +154,8 @@ namespace Export
 
             RacunRepository repo = new RacunRepository(server, database, databaseName);
 
+            if (!repo.DatabasesLoaded()) return;
+
             // Using reflection, get all fields of the class
 
             PropertyInfo[] properties = typeof(Racun).GetProperties();
@@ -167,7 +170,6 @@ namespace Export
                 try
                 {
                     Racun rac = (Racun)repo.NextRecord();
-
                     
 
                     if (rac.iznos_razlike == 0) continue;

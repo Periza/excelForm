@@ -20,6 +20,7 @@ namespace ExcelForm
         private static Server server;
 
         private static Database database;
+        private bool loaded = false;
 
         public KeyedFile racun;
         public KeyedFile mat;
@@ -36,20 +37,29 @@ namespace ExcelForm
             {
                 server = new Server(Dns.GetHostEntry(IPAddress.Loopback).HostName, 10);
             }
+            try
+            {
+                racun = database.openTable(table, mode);
+                mat = database.openTable("mat", mode);
+                mjul = database.openTable("mjul", mode);
+                podst = database.openTable("podst", mode);
 
-            
+                mat.find();
 
-            racun = database.openTable(table, mode);
-            mat = database.openTable("mat", mode);
-            mjul = database.openTable("mjul", mode);
-            podst = database.openTable("podst", mode);
-
-            rewindAll();
-
+                rewindAll();
+                loaded = true;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                MessageBox.Show("Problem pri otvaranju jedne od baza( mjul, racum, mat, podst)");
+            }
+                
         }
 
         public Record NextRecord()
         {
+            if (loaded != true) return null;
             Racun rac = new Racun();
             bool success = false;
             while (!success)
@@ -76,6 +86,7 @@ namespace ExcelForm
 
         public Record PreviousRecord()
         {
+            if (loaded != true) return null;
             Racun rac = new Racun();
             try
             {
@@ -90,8 +101,6 @@ namespace ExcelForm
 
         }
 
-
-
         private void setFields(Racun rac)
         {
             rac.rr_siz = racun.getField("rr_siz").getString();
@@ -105,7 +114,6 @@ namespace ExcelForm
             mat.getField("m_siz").setString(rac.rr_siz);
             mat.getField("m_sif").setString(rac.rr_sif);
             mat.getField("m_sst").setString(rac.rr_sst);
-
             try
             {
                 mat.findu();
@@ -210,12 +218,12 @@ namespace ExcelForm
             }
             catch (KfException ex)
             {
-                // Console.WriteLine("mat exception: " + ex.Message);
+                Console.WriteLine("mat exception: " + ex.Message);
                 // Console.WriteLine($"{rr_siz}, {rr_sst}, {rr_sif}");
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -227,6 +235,10 @@ namespace ExcelForm
             podst.rewind();
         }
 
+        public bool DatabasesLoaded()
+        {
+            return loaded;
+        }
         Record IRecordRepository.GetRecordById()
         {
             throw new NotImplementedException();
